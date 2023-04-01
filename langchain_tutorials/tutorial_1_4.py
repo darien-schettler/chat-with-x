@@ -9,7 +9,7 @@ def conversation_script(model_name="text-davinci-003", temperature=0, verbose=Tr
 
     Args:
         model_name (str): Model name for the LLM
-        temperature (float): Temperature for randomness in output
+        temperature (float): Temperature for randomness in output. A value of 0 will result in the most likely output.
         verbose (bool): Verbose output
         input_clr (str): Color to use for input text label
         response_clr (str): Color to use for response text label
