@@ -70,6 +70,9 @@ def chat_completion_script(model_name="gpt-3.5-turbo", temperature=0,
 # Enter your message (or press enter to exit):
 # >>> [Ask an interesting question... after hearing the answer ask a followup that will demonstrate the memory ability]
 #
+# Alternative system message: 'You are an expert in Python programming and the best practices used to code. Please
+# help the user generate any code that he/she requires. If you can't or don't know how, you should truthfully say you
+# don't know. You should always include code to demonstrate your point or answer the query.'
 def main():
     parser = argparse.ArgumentParser(description="Generate a conversation with memory using LangChain ChatOpenAI agent")
     parser.add_argument("-n", "--model_name", type=str, default="gpt-3.5-turbo", help="Model name for the ChatLLM")
