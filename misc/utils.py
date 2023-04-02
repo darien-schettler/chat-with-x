@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from colorama import init, Fore
+from colorama import init, Fore, Style
 
 
 def print_colored_output(input_text, response_text,
@@ -23,20 +23,20 @@ def print_colored_output(input_text, response_text,
         None; prints the input and response text with the specified colors
     """
 
-    input_color_code = getattr(Fore, input_color.upper(), Fore.RESET)
-    response_color_code = getattr(Fore, response_color.upper(), Fore.RESET)
-    system_color_code = getattr(Fore, system_color.upper(), Fore.RESET)
+    icc = getattr(Fore, input_color.upper(), Fore.RESET)
+    rcc = getattr(Fore, response_color.upper(), Fore.RESET)
+    scc = getattr(Fore, system_color.upper(), Fore.RESET)
 
     if full_color:
         if system_message:
-            print(f"\n{system_color_code}System Message: '{system_message}'{Fore.RESET}")
-        print(f"{input_color_code}Input         : '{input_text}'{Fore.RESET}")
-        print(f"{response_color_code}Response      : '{response_text.strip()}'{Fore.RESET}\n")
+            print(f"\n{scc}{Style.BRIGHT}System Message:{Style.RESET_ALL} {scc}'{system_message}'{Fore.RESET}")
+        print(f"{icc}{Style.BRIGHT}User Input    :{Style.RESET_ALL} {icc}'{input_text}'{Fore.RESET}")
+        print(f"{rcc}{Style.BRIGHT}LLM Response  :{Style.RESET_ALL} {rcc}'{response_text.strip()}'{Fore.RESET}\n")
     else:
         if system_message:
-            print(f"\n{system_color_code}System Message:{Fore.RESET} '{system_message}'")
-        print(f"{input_color_code}Input         :{Fore.RESET} '{input_text}'")
-        print(f"{response_color_code}Response      :{Fore.RESET} '{response_text.strip()}'\n")
+            print(f"\n{scc}System Message:{Fore.RESET} '{system_message}'")
+        print(f"{icc}User Input    :{Fore.RESET} '{input_text}'")
+        print(f"{rcc}LLM Response  :{Fore.RESET} '{response_text.strip()}'\n")
 
 
 def retrieve_local_api_keys():

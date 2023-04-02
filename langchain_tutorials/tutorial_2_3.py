@@ -1,5 +1,6 @@
 import argparse
 from langchain.chat_models import ChatOpenAI
+from langchain import LLMChain
 from langchain.prompts.chat import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
@@ -32,7 +33,7 @@ def chat_completion_script(model_name="gpt-3.5-turbo", temperature=0,
         None; prints the chat completion to the console and interacts with the user
     """
 
-    system_message_template = "You are a helpful assistant that translates {in_lang} to {out_lang}."
+    system_message_template = "You are a helpful assistant that translates {input_language} to {output_language}."
     human_message_template = "{text}"
 
     # Load the API keys from the .env file
@@ -45,6 +46,8 @@ def chat_completion_script(model_name="gpt-3.5-turbo", temperature=0,
     human_message_prompt = HumanMessagePromptTemplate.from_template(human_message_template)
     chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
 
+    chain = LLMChain(llm=chat, prompt=chat_prompt)
+
     # Continue the conversation loop until the user decides to exit
     while True:
 
@@ -53,18 +56,17 @@ def chat_completion_script(model_name="gpt-3.5-turbo", temperature=0,
         if not input_text: break
 
         # Generate the chat completion
-        messages = chat_prompt.format_prompt(in_lang=in_lang, out_lang=out_lang, text=input_text).to_messages()
-        response = chat(messages)
+        response_text = chain.run(input_language=in_lang, output_language=out_lang, text=input_text)
 
-        print_colored_output(input_text, response.content,
-                             system_message_template.format(in_lang=in_lang, out_lang=out_lang),
+        print_colored_output(input_text, response_text,
+                             system_message_template.format(input_language=in_lang, output_language=out_lang),
                              input_clr, response_clr, system_clr,
                              full_color=use_color)
 
 
 # Example usage:
-# python3 -m langchain_tutorials.tutorial_2_2 -l2="Inuktitut"
-# 'The wide river runs from the North to the South and freezes over in the winter'
+# python3 -m langchain_tutorials.tutorial_2_3 -l2="Inuktitut"
+# 'The river runs from south to North' --> 'ᐃᑭᒋᐊᕐᕕᖓ ᑲᑉᐳᑎᓗᒍ'
 def main():
     parser = argparse.ArgumentParser(description="Generate a chat completion using LangChain ChatOpenAI")
     parser.add_argument("-n", "--model_name", type=str, default="gpt-3.5-turbo", help="Model name for the ChatLLM")
