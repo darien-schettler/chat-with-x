@@ -51,7 +51,9 @@ def chat_completion_script(model_name="gpt-3.5-turbo", temperature=0,
 
         # Print the response
         print_colored_output(input_text, response,
-                             input_color=input_clr, response_color=response_clr, full_color=use_color)
+                             input_color=input_clr,
+                             response_color=response_clr,
+                             full_color=use_color)
 
 
 # Example Usage:

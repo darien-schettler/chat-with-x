@@ -7,4 +7,8 @@ apify-client>=1.0.0
 chromadb>=0.3.18
 unstructured
 faiss-cpu
-gradio
+gradio~=3.24.1
+pypdf>=3.7.0
+fastapi~=0.95.0
+uvicorn~=0.21.1
+pydantic~=1.10.7
