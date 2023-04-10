@@ -628,9 +628,227 @@ Wall time: 1.04 s
 ---
 
 <details>
-<summary><b>TBD</b>TBD</summary>
+<summary><b>LLM Configs:</b> How to serialize LLM classes</summary>
 
-TBD
+We want to know how to write and read an LLM Configuration to and from disk. 
+* This is useful if you want to save the configuration for a given LLM (e.g., the provider, the temperature, etc).
+* We did not write a specific tutorial for this. However, we added a helper function for both json and yaml
+
+```python
+from langchain.llms import OpenAI
+from langchain.llms.loading import load_llm
+```
+
+**Loading From Disk**
+
+LLMs can be saved on disk in two formats: 
+* json
+* yaml
+ 
+No matter the extension, they are loaded in the same way.
+
+
+```terminal
+!cat llm.json
+
+{
+    "model_name": "text-davinci-003",
+    "temperature": 0.7,
+    "max_tokens": 256,
+    "top_p": 1.0,
+    "frequency_penalty": 0.0,
+    "presence_penalty": 0.0,
+    "n": 1,
+    "best_of": 1,
+    "request_timeout": null,
+    "_type": "openai"
+}
+```
+
+Load with:
+
+```python
+llm = load_llm("llm.json")
+```
+
+```terminal
+!cat llm.yaml
+
+_type: openai
+best_of: 1
+frequency_penalty: 0.0
+max_tokens: 256
+model_name: text-davinci-003
+n: 1
+presence_penalty: 0.0
+request_timeout: null
+temperature: 0.7
+top_p: 1.0
+```
+
+Load with:
+
+```python
+llm = load_llm("llm.yaml")
+```
+
+**Saving To Disk**
+
+If you want to go from a LLM in memory to a serialized version of it, you can do so easily by calling the 
+**`.save method`**. 
+* Again, this supports both json and yaml.
+
+```python
+llm.save("llm.json")
+
+# OR 
+
+llm.save("llm.yaml")
+```
+</details>
+
+---
+
+<details>
+<summary><b>Streaming:</b> How to stream LLM responses (like ChatGPT)!</summary>
+
+LangChain provides streaming support for LLMs. Currently, we only support streaming for the `OpenAI` 
+and `ChatOpenAI` LLM implementation, but streaming support for other LLM implementations is on the roadmap. 
+* To utilize streaming, use a [**`CallbackHandler`**](https://github.com/hwchase17/langchain/blob/master/langchain/callbacks/base.py) that implements `on_llm_new_token`. 
+* In this example, we are using `StreamingStdOutCallbackHandler`.
+
+```python
+from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
+from langchain.callbacks.base import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain.schema import HumanMessage
+
+
+llm = OpenAI(streaming=True, callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]), verbose=True, temperature=0)
+resp = llm("Write me a song about sparkling water.")
+```
+
+```text
+Verse 1
+I'm sippin' on sparkling water,
+It's so refreshing and light,
+It's the perfect way to quench my thirst
+On a hot summer night.
+
+Chorus
+Sparkling water, sparkling water,
+It's the best way to stay hydrated,
+It's so crisp and so clean,
+It's the perfect way to stay refreshed.
+
+Verse 2
+I'm sippin' on sparkling water,
+It's so bubbly and bright,
+It's the perfect way to cool me down
+On a hot summer night.
+
+Chorus
+Sparkling water, sparkling water,
+It's the best way to stay hydrated,
+It's so crisp and so clean,
+It's the perfect way to stay refreshed.
+
+Verse 3
+I'm sippin' on sparkling water,
+It's so light and so clear,
+It's the perfect way to keep me cool
+On a hot summer night.
+
+Chorus
+Sparkling water, sparkling water,
+It's the best way to stay hydrated,
+It's so crisp and so clean,
+It's the perfect way to stay refreshed.
+```
+
+We still have access to the end `LLMResult` if using `generate`. 
+* However, `token_usage` is not currently supported for streaming.
+
+```python
+llm.generate(["Tell me a joke."])
+```
+
+```text
+Q: What did the fish say when it hit the wall?
+A: Dam!
+```
+
+```terminal
+LLMResult(generations=[[Generation(text='\n\nQ: What did the fish say when it hit the wall?\nA: Dam!', generation_info={'finish_reason': None, 'logprobs': None})]], llm_output={'token_usage': {}})
+```
+
+Here’s an example with **`ChatOpenAI`**:
+
+```python
+chat = ChatOpenAI(streaming=True, callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]), verbose=True, temperature=0)
+resp = chat([HumanMessage(content="Write me a song about sparkling water.")])
+```
+
+```text
+Verse 1:
+Bubbles rising to the top
+A refreshing drink that never stops
+Clear and crisp, it's pure delight
+A taste that's sure to excite
+
+Chorus:
+Sparkling water, oh so fine
+A drink that's always on my mind
+With every sip, I feel alive
+Sparkling water, you're my vibe
+
+Verse 2:
+No sugar, no calories, just pure bliss
+A drink that's hard to resist
+It's the perfect way to quench my thirst
+A drink that always comes first
+
+Chorus:
+Sparkling water, oh so fine
+A drink that's always on my mind
+With every sip, I feel alive
+Sparkling water, you're my vibe
+
+Bridge:
+From the mountains to the sea
+Sparkling water, you're the key
+To a healthy life, a happy soul
+A drink that makes me feel whole
+
+Chorus:
+Sparkling water, oh so fine
+A drink that's always on my mind
+With every sip, I feel alive
+Sparkling water, you're my vibe
+
+Outro:
+Sparkling water, you're the one
+A drink that's always so much fun
+I'll never let you go, my friend
+Sparkling
+```
+
+</details>
+
+---
+
+<details>
+<summary><b>TBD:</b> TBD</summary>
+
+
+</details>
+
+---
+
+<details>
+<summary><b>NEXT:</b> TBD</summary>
+
 
 </details>
 

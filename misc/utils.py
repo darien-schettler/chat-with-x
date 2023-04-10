@@ -1,12 +1,14 @@
 from dotenv import load_dotenv
 from colorama import init, Fore, Style
-from langchain.llms import OpenAI
 from functools import wraps
 from typing import Any
 import asyncio
 import pickle
 import time
 import os
+
+from langchain.llms.loading import load_llm
+from langchain.llms import OpenAI
 
 init(autoreset=True)
 
@@ -176,3 +178,13 @@ class TimedOpenAI(OpenAI):
     @timeit
     def __call__(self, *args, **kwargs):
         return super().__call__(*args, **kwargs)
+
+
+def load_llm_from_file(file_path):
+    """ Load a LLM instance from a file (serialized) """
+    return load_llm(file_path)
+
+
+def save_llm_to_file(llm_instance, file_path):
+    """ Save a LLM instance to a file (serialized)"""
+    llm_instance.save(file_path)
