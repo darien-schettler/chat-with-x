@@ -918,8 +918,77 @@ Final Answer: Jason Sudeikis, Olivia Wilde's boyfriend, is 47 years old and his 
 
 ---
 
+<br>
+
+### 1.3 Integrations 
+
+---
+
 <details>
-<summary><b>NEXT:</b> TBD</summary>
+<summary><b>🤗:</b> HuggingFace Hub Integration</summary>
+
+This example showcases how to connect to the Hugging Face Hub.
+* This requires an environment variable: **`HUGGINGFACEHUB_API_TOKEN="hf_Pxxxx`**
+
+```python
+from langchain import PromptTemplate, HuggingFaceHub, LLMChain
+
+template = """Question: {question}
+
+Answer: Let's think step by step."""
+prompt = PromptTemplate(template=template, input_variables=["question"])
+llm_chain = LLMChain(prompt=prompt, llm=HuggingFaceHub(repo_id="google/flan-t5-xl", model_kwargs={"temperature":0, "max_length":64}))
+
+question = "What NFL team won the Super Bowl in the year Justin Beiber was born?"
+
+print(llm_chain.run(question))
+```
+
+```text
+The Seattle Seahawks won the Super Bowl in 2010. Justin Beiber was born in 2010. The final answer: Seattle Seahawks.
+```
+
+</details>
+
+---
+
+<br>
+
+## 2. Chat Models: 
+
+Chat models are a variation on language models. 
+* While chat models use language models under the hood, the interface they expose is a bit different. 
+* Rather than expose a “text in, text out” API, they expose a “chat messages” interface for inputs and outputs.
+
+Chat model APIs are fairly new, so we are still figuring out the correct abstractions. 
+The following sections of documentation are provided:
+* **Getting Started:** 
+  * An overview of all the functionality the LangChain LLM class provides.
+* **How-To Guides:** 
+  * A collection of how-to guides. 
+  * These highlight how to accomplish various objectives with our LLM class (streaming, async, etc).
+* **Integrations:** 
+  * A collection of examples on how to integrate different LLM providers with LangChain (OpenAI, Hugging Face, etc).
+
+---
+
+<br>
+
+### 2.1 Getting Started: 
+
+---
+
+
+<details>
+<summary><b>Getting Started:</b> Using the LLM class in LangChain</summary>
+
+
+</details>
+
+---
+
+<details>
+<summary><b>TBD</b> TBD</summary>
 
 
 </details>
