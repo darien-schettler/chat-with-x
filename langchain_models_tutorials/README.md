@@ -839,8 +839,80 @@ Sparkling
 ---
 
 <details>
-<summary><b>TBD:</b> TBD</summary>
+<summary><b>Track Token Usage:</b> Monitor token usage (OpenAI only)</summary>
 
+
+This script will go over how to track your token usage for specific calls. 
+* It is currently only implemented for the OpenAI API.
+
+Let’s first look at an extremely simple example of tracking token usage for a single LLM call.
+
+```python
+from langchain.llms import OpenAI
+from langchain.callbacks import get_openai_callback
+
+llm = OpenAI(model_name="text-davinci-002", n=2, best_of=2)
+
+with get_openai_callback() as cb:
+    result = llm("Tell me a joke")
+    print(cb.total_tokens)
+```
+
+```text
+42
+```
+
+Anything inside the context manager will get tracked. 
+
+Here’s an example of using it to track multiple calls in sequence.
+
+```python
+with get_openai_callback() as cb:
+    result = llm("Tell me a joke")
+    result2 = llm("Tell me a joke")
+    print(cb.total_tokens)
+```
+
+```text
+83
+```
+
+If a chain or agent with multiple steps in it is used, it will track all those steps.
+
+```python
+from langchain.agents import load_tools
+from langchain.agents import initialize_agent
+from langchain.llms import OpenAI
+
+llm = OpenAI(temperature=0)
+tools = load_tools(["serpapi", "llm-math"], llm=llm)
+agent = initialize_agent(tools, llm, agent="zero-shot-react-description", verbose=True)
+with get_openai_callback() as cb:
+    response = agent.run("Who is Olivia Wilde's boyfriend? What is his current age raised to the 0.23 power?")
+    print(cb.total_tokens)
+```
+
+```text
+> Entering new AgentExecutor chain...
+ I need to find out who Olivia Wilde's boyfriend is and then calculate his age raised to the 0.23 power.
+Action: Search
+Action Input: "Olivia Wilde boyfriend"
+Observation: Jason Sudeikis
+Thought: I need to find out Jason Sudeikis' age
+Action: Search
+Action Input: "Jason Sudeikis age"
+Observation: 47 years
+Thought: I need to calculate 47 raised to the 0.23 power
+Action: Calculator
+Action Input: 47^0.23
+Observation: Answer: 2.4242784855673896
+
+Thought: I now know the final answer
+Final Answer: Jason Sudeikis, Olivia Wilde's boyfriend, is 47 years old and his age raised to the 0.23 power is 2.4242784855673896.
+
+> Finished chain.
+1465
+```
 
 </details>
 

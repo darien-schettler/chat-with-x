@@ -7,7 +7,10 @@ import pickle
 import time
 import os
 
+from langchain.callbacks.base import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.llms.loading import load_llm
+from langchain.chat_models import ChatOpenAI
 from langchain.llms import OpenAI
 
 init(autoreset=True)
@@ -188,3 +191,7 @@ def load_llm_from_file(file_path):
 def save_llm_to_file(llm_instance, file_path):
     """ Save a LLM instance to a file (serialized)"""
     llm_instance.save(file_path)
+
+
+def get_streaming_cb():
+    return CallbackManager([StreamingStdOutCallbackHandler()])
