@@ -1,11 +1,14 @@
 from dotenv import load_dotenv
 from colorama import init, Fore, Style
+from langchain.llms import OpenAI
 from functools import wraps
 from typing import Any
 import asyncio
 import pickle
 import time
 import os
+
+init(autoreset=True)
 
 
 def load_pickle_file(file_path: str) -> Any:
@@ -48,6 +51,11 @@ def save_pickle_file(file_path: str, data: Any) -> None:
 
     with open(file_path, "wb") as file:
         pickle.dump(data, file)
+
+
+def simple_colorizer(text, input_color="yellow"):
+    icc = getattr(Fore, input_color.upper(), Fore.RESET)
+    return f"{icc}{Style.BRIGHT}{text}{Style.RESET_ALL}{Fore.RESET}"
 
 
 def print_colored_output(input_text, response_text,
@@ -144,13 +152,13 @@ def print_ln(symbol="-", line_len=110, newline_before=False, newline_after=False
     if newline_after: print()
 
 
-def timing_decorator(func):
+def timeit(func):
     @wraps(func)
     async def async_wrapper(*args, **kwargs):
         start = time.perf_counter()
         result = await func(*args, **kwargs)
         elapsed = time.perf_counter() - start
-        print(f"{func.__name__} executed in {elapsed:.2f} seconds.")
+        print(simple_colorizer(f"{func.__name__} executed in {elapsed:.5f} seconds. [ASYNC]"))
         return result
 
     @wraps(func)
@@ -158,7 +166,13 @@ def timing_decorator(func):
         start = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - start
-        print(f"{func.__name__} executed in {elapsed:.2f} seconds.")
+        print(simple_colorizer(f"{func.__name__} executed in {elapsed:.5f} seconds."))
         return result
 
     return async_wrapper if asyncio.iscoroutinefunction(func) else sync_wrapper
+
+
+class TimedOpenAI(OpenAI):
+    @timeit
+    def __call__(self, *args, **kwargs):
+        return super().__call__(*args, **kwargs)

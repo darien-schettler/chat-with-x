@@ -2,10 +2,10 @@ import time
 import asyncio
 import argparse
 from langchain.llms import OpenAI
-from misc.utils import retrieve_local_api_keys, print_colored_output, timing_decorator
+from misc.utils import retrieve_local_api_keys, print_colored_output, timeit
 
 
-@timing_decorator
+@timeit
 def generate_serially(llm, input_text, n_reps=3):
     for _ in range(n_reps):
         resp = llm.generate([input_text])
@@ -17,7 +17,7 @@ async def async_generate(llm, input_text):
     print_colored_output(input_text, response_text=resp.generations[0][0].text.strip(), full_color=True)
 
 
-@timing_decorator
+@timeit
 async def generate_concurrently(llm, input_text, n_reps=3):
     tasks = [async_generate(llm, input_text) for _ in range(n_reps)]
     await asyncio.gather(*tasks)

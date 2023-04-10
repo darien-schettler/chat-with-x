@@ -30,7 +30,7 @@ def llm_interaction(
         input_text = input("\nEnter your message - i.e. 'What's 2+2?' (or press enter to exit):\n")
         if not input_text: break
 
-        response = agent.run("whats 2 + 2")
+        response = agent.run(input_text)
         print_colored_output(input_text, response_text=response.strip(), full_color=True)
 
 
