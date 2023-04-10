@@ -1,7 +1,10 @@
 from dotenv import load_dotenv
 from colorama import init, Fore, Style
+from functools import wraps
 from typing import Any
+import asyncio
 import pickle
+import time
 import os
 
 
@@ -108,3 +111,54 @@ def remove_api_keys(keys_to_remove=None):
 def retrieve_local_api_keys():
     """ Load the API keys from the .env file using dotenv """
     load_dotenv()
+
+
+def flatten_l_o_l(nested_list):
+    """Flatten a list of lists into a single list.
+
+    Args:
+        nested_list (list):
+            – A list of lists (or iterables) to be flattened.
+
+    Returns:
+        list: A flattened list containing all items from the input list of lists.
+    """
+    return [item for sublist in nested_list for item in sublist]
+
+
+def print_ln(symbol="-", line_len=110, newline_before=False, newline_after=False):
+    """Print a horizontal line of a specified length and symbol.
+
+    Args:
+        symbol (str, optional):
+            – The symbol to use for the horizontal line
+        line_len (int, optional):
+            – The length of the horizontal line in characters
+        newline_before (bool, optional):
+            – Whether to print a newline character before the line
+        newline_after (bool, optional):
+            – Whether to print a newline character after the line
+    """
+    if newline_before: print()
+    print(symbol * line_len)
+    if newline_after: print()
+
+
+def timing_decorator(func):
+    @wraps(func)
+    async def async_wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = await func(*args, **kwargs)
+        elapsed = time.perf_counter() - start
+        print(f"{func.__name__} executed in {elapsed:.2f} seconds.")
+        return result
+
+    @wraps(func)
+    def sync_wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed = time.perf_counter() - start
+        print(f"{func.__name__} executed in {elapsed:.2f} seconds.")
+        return result
+
+    return async_wrapper if asyncio.iscoroutinefunction(func) else sync_wrapper

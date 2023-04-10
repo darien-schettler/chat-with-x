@@ -1,6 +1,6 @@
 <br>
 
-# LANGCHAIN TUTORIALS FROM THE <a href="https://python.langchain.com/en/latest/getting_started/getting_started.html">DOCS</a>
+# LANGCHAIN <u>QUICKSTART</u> TUTORIALS FROM THE <a href="https://python.langchain.com/en/latest/getting_started/getting_started.html">DOCS</a>
 
 There are two primary sections of tutorials in the getted starting section.
 1. Building a Language Model Application: LLMs

@@ -65,7 +65,7 @@ def chat_completion_script(model_name="gpt-3.5-turbo", temperature=0,
 
 
 # Example usage:
-# python3 -m langchain_tutorials.tutorial_2_3 -l2="Inuktitut"
+# python3 -m langchain_quickstart_tutorials.tutorial_2_3 -l2="Inuktitut"
 # 'The river runs from south to North' --> 'ᐃᑭᒋᐊᕐᕕᖓ ᑲᑉᐳᑎᓗᒍ'
 def main():
     parser = argparse.ArgumentParser(description="Generate a chat completion using LangChain ChatOpenAI")

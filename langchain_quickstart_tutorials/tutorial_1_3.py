@@ -64,7 +64,7 @@ def main():
 
 
 # Example Usage:
-# python3 -m langchain_tutorials.tutorial_1_3 \
+# python3 -m langchain_quickstart_tutorials.tutorial_1_3 \
 # "List all AI models that were released in 2023 as well as who released them and the date they were released:" -v
 if __name__ == "__main__":
     main()

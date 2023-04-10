@@ -57,7 +57,7 @@ def chat_completion_script(model_name="gpt-3.5-turbo", temperature=0,
 
 
 # Example Usage:
-# python3 -m langchain_tutorials.tutorial_2_4 -v
+# python3 -m langchain_quickstart_tutorials.tutorial_2_4 -v
 #
 # Enter your message (or press enter to exit):
 # >>> 'Who is Olivia Wilde's boyfriend? What is his current age raised to the 0.23 power?'

@@ -65,7 +65,7 @@ def chat_completion_script(model_name="gpt-3.5-turbo", temperature=0,
 
 
 # Example Usage:
-# python3 -m langchain_tutorials/tutorial_2_5
+# python3 -m langchain_quickstart_tutorials/tutorial_2_5
 #
 # Enter your message (or press enter to exit):
 # >>> [Ask an interesting question... after hearing the answer ask a followup that will demonstrate the memory ability]

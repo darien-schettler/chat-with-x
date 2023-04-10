@@ -70,7 +70,7 @@ def main():
 
 
 # Example usage:
-# python3 -m langchain_tutorials.tutorial_1_2 \
+# python3 -m langchain_quickstart_tutorials.tutorial_1_2 \
 # "inner elbow crease" \
 # -ptp="If you had only ever read shakespeare and plato and your best friend was a pineapple \
 # and a talking cat, what would you name your"  -t=1.75
