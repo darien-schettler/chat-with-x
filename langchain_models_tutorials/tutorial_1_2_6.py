@@ -87,7 +87,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Interact with an LLM to demonstrate the streaming functionality within LangChain")
     parser.add_argument("-n", "--model_name", type=str, default="text-davinci-002", help="Model name for the LLM")
-    parser.add_argument("-t", "--temperature", type=float, default=0.75, help="Temperature for randomness in output")
+    parser.add_argument("-t", "--temperature", type=float, default=0.0, help="Temperature for randomness in output")
     parser.add_argument("-c", "--use_color", action="store_false", help="Color only to titles")
     parser.add_argument("--input_clr", type=str, default="blue", help="Color for user input text")
     parser.add_argument("--response_clr", type=str, default="red", help="Color for AI response text")

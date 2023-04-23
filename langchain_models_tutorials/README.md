@@ -982,14 +982,272 @@ The following sections of documentation are provided:
 <details>
 <summary><b>Getting Started:</b> Using the LLM class in LangChain</summary>
 
+This tutorial section covers how to get started with chat models. 
+The interface is based around messages rather than raw text.
+
+```python
+from langchain.chat_models import ChatOpenAI
+from langchain import PromptTemplate, LLMChain
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    AIMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
+from langchain.schema import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage
+)
+```
+
+```python
+chat = ChatOpenAI(temperature=0)
+```
+
+You can get chat completions by passing one or more messages to the chat model. 
+The response will be a message. 
+* The types of messages currently supported in LangChain are :
+  * AIMessage`
+  * `HumanMessage`
+  * `SystemMessage`
+  * `ChatMessage`
+    * `ChatMessage` takes in an arbitrary role parameter.
+* Most of the time, you’ll just be dealing with `HumanMessage`, `AIMessage`, and `SystemMessage`
+
+```python
+chat([HumanMessage(content="Translate this sentence from English to French. I love programming.")])
+```
+
+```python
+AIMessage(content="J'aime programmer.", additional_kwargs={})
+```
+
+OpenAI’s chat model supports multiple messages as input. 
+* See [here](https://platform.openai.com/docs/guides/chat/chat-vs-completions) for more information. 
+* Here is an example of sending a system and user message to the chat model:
+
+```python
+messages = [
+    SystemMessage(content="You are a helpful assistant that translates English to French."),
+    HumanMessage(content="Translate this sentence from English to French. I love programming.")
+]
+chat(messages)
+```
+    
+```python
+AIMessage(content="J'aime programmer.", additional_kwargs={})
+```
+
+You can go one step further and generate completions for multiple sets of messages using `generate`. 
+* This returns an `LLMResult` with an additional `message` parameter.
+
+```python
+batch_messages = [
+    [
+        SystemMessage(content="You are a helpful assistant that translates English to French."),
+        HumanMessage(content="Translate this sentence from English to French. I love programming.")
+    ],
+    [
+        SystemMessage(content="You are a helpful assistant that translates English to French."),
+        HumanMessage(content="Translate this sentence from English to French. I love artificial intelligence.")
+    ],
+]
+result = chat.generate(batch_messages)
+result
+```
+
+```python
+LLMResult(generations=[
+  [ChatGeneration(text="J'aime programmer.", 
+                  generation_info=None, 
+                  message=AIMessage(content="J'aime programmer.", additional_kwargs={}))], 
+  [ChatGeneration(text="J'aime l'intelligence artificielle.", 
+                  generation_info=None, 
+                  message=AIMessage(content="J'aime l'intelligence artificielle.", additional_kwargs={}))]], 
+  llm_output={'token_usage': {'prompt_tokens': 71, 'completion_tokens': 18, 'total_tokens': 89}}
+)
+```
+
+You can recover things like token usage from this LLMResult
+
+```python
+result.llm_output
+```
+
+```python
+{'token_usage': {'prompt_tokens': 71,
+  'completion_tokens': 18,
+  'total_tokens': 89}}
+```
+
+<br>
+
+**PROMPT TEMPLATES**
+
+You can make use of templating by using a `MessagePromptTemplate`. 
+* You can build a `ChatPromptTemplate` from one or more `MessagePromptTemplates`. 
+* You can use `ChatPromptTemplate`’s `format_prompt` – this returns a `PromptValue`, which you can convert to a string or Message object, depending on whether you want to use the formatted value as input to an llm or chat model.
+
+For convience, there is a `from_template` method exposed on the template. 
+* If you were to use this template, this is what it would look like:
+
+```python
+template="You are a helpful assistant that translates {input_language} to {output_language}."
+system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+human_template="{text}"
+human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+```
+
+```python
+chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, human_message_prompt])
+
+# get a chat completion from the formatted messages
+chat(chat_prompt.format_prompt(input_language="English", output_language="French", text="I love programming.").to_messages())
+```
+
+```python
+AIMessage(content="J'adore la programmation.", additional_kwargs={})
+```
+
+If you wanted to construct the `MessagePromptTemplate` 
+more directly, you could create a `PromptTemplate` outside and then pass it in, eg:
+
+```python
+prompt=PromptTemplate(
+    template="You are a helpful assistant that translates {input_language} to {output_language}.",
+    input_variables=["input_language", "output_language"],
+)
+system_message_prompt = SystemMessagePromptTemplate(prompt=prompt)
+```
+
+<br>
+
+**LLMCHAIN**
+
+You can use the existing `LLMChain` in a very similar way to before - provide a prompt and a model.
+
+```python
+chain = LLMChain(llm=chat, prompt=chat_prompt)
+```
+
+```python
+chain.run(input_language="English", output_language="French", text="I love programming.")
+```
+
+```python
+"J'adore la programmation."
+```
+
+<br>
+
+**STREAMING**
+
+Streaming is supported for `ChatOpenAI` through callback handling.
+
+```python
+from langchain.callbacks.base import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+chat = ChatOpenAI(streaming=True, callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]), verbose=True, temperature=0)
+resp = chat([HumanMessage(content="Write me a song about sparkling water.")])
+```
+
+```terminal
+Verse 1:
+Bubbles rising to the top
+A refreshing drink that never stops
+....
+```
 
 </details>
 
 ---
 
-<details>
-<summary><b>TBD</b> TBD</summary>
+<br>
 
+### 2.2 How-To Guides: 
+
+---
+
+<details>
+<summary><b>Few Shot Examples</b> How-To Use</summary>
+
+This notebook covers how to use few shot examples in chat models.
+* There does not appear to be solid consensus on how best to do few shot prompting. 
+* As a result, we are not solidifying any abstractions around this yet but rather using existing abstractions.
+
+<br>
+
+**Alternating Human/AI messages**
+
+The first way of doing few shot prompting relies on using alternating human/ai messages. See an example of this below.
+
+```python
+from langchain.chat_models import ChatOpenAI
+from langchain import PromptTemplate, LLMChain
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    AIMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
+from langchain.schema import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage
+)
+```
+
+```python
+chat = ChatOpenAI(temperature=0)
+```
+
+```python
+template="You are a helpful assistant that translates english to pirate."
+system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+example_human = HumanMessagePromptTemplate.from_template("Hi")
+example_ai = AIMessagePromptTemplate.from_template("Argh me mateys")
+human_template="{text}"
+human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+```
+
+```python
+chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, example_human, example_ai, human_message_prompt])
+chain = LLMChain(llm=chat, prompt=chat_prompt)
+# get a chat completion from the formatted messages
+chain.run("I love programming.")
+```
+
+```terminal
+"I be lovin' programmin', me hearty!"
+```
+
+<br>
+
+**System Messages**
+
+OpenAI provides an optional name parameter that they also recommend using in conjunction with system messages 
+to do few shot prompting. Here is an example of how to do that below.
+
+```python
+template="You are a helpful assistant that translates english to pirate."
+system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+example_human = SystemMessagePromptTemplate.from_template("Hi", additional_kwargs={"name": "example_user"})
+example_ai = SystemMessagePromptTemplate.from_template("Argh me mateys", additional_kwargs={"name": "example_assistant"})
+human_template="{text}"
+human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+```
+
+```python
+chat_prompt = ChatPromptTemplate.from_messages([system_message_prompt, example_human, example_ai, human_message_prompt])
+chain = LLMChain(llm=chat, prompt=chat_prompt)
+# get a chat completion from the formatted messages
+chain.run("I love programming.")
+```
+
+```terminal
+"I be lovin' programmin', me hearty."
+```
 
 </details>
 
